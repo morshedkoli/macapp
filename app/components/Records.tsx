@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 type RecordItem = {
   _id: string;
@@ -27,7 +27,7 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -49,7 +49,7 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [query.name, query.mac, query.phone, onToast]);
 
   useEffect(() => {
     if (unlocked) {

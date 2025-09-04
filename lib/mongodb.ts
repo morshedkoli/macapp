@@ -16,8 +16,8 @@ const mongoUri: string = MONGODB_URI;
  */
 declare global {
   var mongoose: {
-    conn: any;
-    promise: Promise<any> | null;
+    conn: typeof import('mongoose') | null;
+    promise: Promise<typeof import('mongoose')> | null;
   };
 }
 
@@ -37,7 +37,7 @@ async function connectDB() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(mongoUri, opts).catch((error: unknown) => {
+    cached.promise = mongoose.connect(mongoUri, opts).catch(() => {
       return mongoose;
     });
   }

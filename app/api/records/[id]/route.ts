@@ -29,19 +29,20 @@ function isValidPhone(phone: string) {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const lock = await ensureUnlocked();
   if (lock) return lock;
 
   try {
     await connectDB();
+    const { id } = await params;
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return Response.json({ error: "Invalid ID format" }, { status: 400 });
     }
 
-    const record = await Record.findById(params.id).lean();
+    const record = await Record.findById(id).lean();
     if (!record) return Response.json({ error: "Not found" }, { status: 404 });
     return Response.json({ record });
   } catch (error) {
@@ -52,15 +53,16 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const lock = await ensureUnlocked();
   if (lock) return lock;
 
   try {
     await connectDB();
+    const { id } = await params;
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return Response.json({ error: "Invalid ID format" }, { status: 400 });
     }
 
@@ -86,7 +88,7 @@ export async function PATCH(
     }
 
     const updated = await Record.findByIdAndUpdate(
-      params.id,
+      id,
       updateData,
       { new: true, runValidators: true }
     ).lean();
@@ -107,19 +109,20 @@ export async function PATCH(
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const lock = await ensureUnlocked();
   if (lock) return lock;
 
   try {
     await connectDB();
+    const { id } = await params;
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return Response.json({ error: "Invalid ID format" }, { status: 400 });
     }
 
-    const deleted = await Record.findByIdAndDelete(params.id).lean();
+    const deleted = await Record.findByIdAndDelete(id).lean();
     if (!deleted) {
       return Response.json({ error: "Record not found" }, { status: 404 });
     }
