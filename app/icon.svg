@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0EA5E9"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="256" y1="80" x2="256" y2="432" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="512" height="512" rx="108" fill="url(#bg)"/>
+
+  <!-- Router body -->
+  <g filter="url(#shadow)">
+    <rect x="76" y="260" width="360" height="120" rx="18" fill="#0B1220"/>
+    <rect x="86" y="270" width="340" height="100" rx="12" fill="#0F172A"/>
+  </g>
+
+  <!-- Router top highlight -->
+  <rect x="86" y="270" width="340" height="30" rx="12" fill="url(#glow)" opacity="0.15"/>
+
+  <!-- Antennas -->
+  <path d="M136 180 L136 260" stroke="#E5E7EB" stroke-width="16" stroke-linecap="round"/>
+  <path d="M376 180 L376 260" stroke="#E5E7EB" stroke-width="16" stroke-linecap="round"/>
+  <!-- Antenna tips -->
+  <circle cx="136" cy="170" r="10" fill="#A5B4FC"/>
+  <circle cx="376" cy="170" r="10" fill="#A5B4FC"/>
+
+  <!-- Signal waves (left) -->
+  <path d="M110 170 q26 -26 52 0" stroke="#93C5FD" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.9"/>
+  <path d="M94 170 q42 -42 84 0" stroke="#93C5FD" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <path d="M78 170 q58 -58 116 0" stroke="#93C5FD" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- Signal waves (right) -->
+  <path d="M402 170 q-26 -26 -52 0" stroke="#93C5FD" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.9"/>
+  <path d="M418 170 q-42 -42 -84 0" stroke="#93C5FD" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <path d="M434 170 q-58 -58 -116 0" stroke="#93C5FD" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- Ports / LEDs -->
+  <circle cx="150" cy="320" r="8" fill="#10B981"/>
+  <circle cx="180" cy="320" r="8" fill="#F59E0B"/>
+  <circle cx="210" cy="320" r="8" fill="#EF4444"/>
+  <rect x="260" y="310" width="140" height="20" rx="6" fill="#1F2937"/>
+  <rect x="260" y="340" width="90" height="20" rx="6" fill="#1F2937"/>
+
+  <!-- Subtle base shadow -->
+  <ellipse cx="256" cy="400" rx="160" ry="16" fill="#000" opacity="0.22"/>
+
+  <!-- Filters -->
+  <defs>
+    <filter id="shadow" x="56" y="240" width="400" height="160" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="4"/>
+      <feGaussianBlur stdDeviation="12"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+</svg>
