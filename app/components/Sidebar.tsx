@@ -7,9 +7,11 @@ type SidebarProps = {
   onViewChange: (view: string) => void;
   onLock: () => void;
   disabled?: boolean;
+  mobileOpen?: boolean;
+  onToggleMobile?: (open: boolean) => void;
 };
 
-export default function Sidebar({ currentView, onViewChange, onLock, disabled }: SidebarProps) {
+export default function Sidebar({ currentView, onViewChange, onLock, disabled, mobileOpen, onToggleMobile }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const menuItems = [
@@ -18,19 +20,32 @@ export default function Sidebar({ currentView, onViewChange, onLock, disabled }:
     { id: "add", label: "Add Record", icon: "➕" },
   ];
 
+  const sidebarClasses = `sidebar ${isCollapsed ? 'sidebar-collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`;
+
   return (
-    <div className={`sidebar ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
+    <div className={sidebarClasses}>
       <div className="sidebar-header">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
             <h2 className="text-lg font-semibold text-primary">MAC Dashboard</h2>
           )}
+          {/* Collapse toggle (desktop/tablet only) */}
           <button
-            className="btn-ghost sidebar-toggle"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="btn-ghost sidebar-toggle hidden sm:block"
             onClick={() => setIsCollapsed(!isCollapsed)}
             disabled={disabled}
           >
             {isCollapsed ? "→" : "←"}
+          </button>
+          {/* Mobile close button */}
+          <button
+            aria-label="Close menu"
+            className="btn-ghost sidebar-toggle sm:hidden"
+            onClick={() => onToggleMobile && onToggleMobile(false)}
+            disabled={disabled}
+          >
+            ✕
           </button>
         </div>
       </div>
@@ -40,8 +55,12 @@ export default function Sidebar({ currentView, onViewChange, onLock, disabled }:
           <button
             key={item.id}
             className={`sidebar-nav-item ${currentView === item.id ? 'active' : ''}`}
-            onClick={() => onViewChange(item.id)}
+            onClick={() => {
+              onViewChange(item.id);
+              if (onToggleMobile) onToggleMobile(false);
+            }}
             disabled={disabled}
+            aria-current={currentView === item.id ? 'page' : undefined}
           >
             <span className="sidebar-icon">{item.icon}</span>
             {!isCollapsed && <span>{item.label}</span>}
@@ -52,7 +71,10 @@ export default function Sidebar({ currentView, onViewChange, onLock, disabled }:
       <div className="sidebar-footer">
         <button
           className="btn btn-outline w-full"
-          onClick={onLock}
+          onClick={() => {
+            if (onToggleMobile) onToggleMobile(false);
+            onLock();
+          }}
           disabled={disabled}
         >
           {!isCollapsed ? "🔒 Lock" : "🔒"}

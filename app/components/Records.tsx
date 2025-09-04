@@ -27,14 +27,15 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (q?: { name: string; mac: string; phone: string }) => {
     setLoading(true);
     setError(null);
+    const target = q ?? query; // use provided query or current state
     try {
       const qs = new URLSearchParams();
-      if (query.name) qs.set("name", query.name);
-      if (query.mac) qs.set("mac", query.mac);
-      if (query.phone) qs.set("phone", query.phone);
+      if (target.name) qs.set("name", target.name);
+      if (target.mac) qs.set("mac", target.mac);
+      if (target.phone) qs.set("phone", target.phone);
       const res = await fetch(`/api/records?${qs.toString()}`, { cache: "no-store" });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
@@ -49,7 +50,7 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
     } finally {
       setLoading(false);
     }
-  }, [query.name, query.mac, query.phone, onToast]);
+  }, [query, onToast]);
 
   useEffect(() => {
     if (unlocked) {
@@ -57,7 +58,9 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
     } else {
       setRecords([]);
     }
-  }, [unlocked, load]);
+    // We intentionally avoid tying this to query changes to prevent search-on-type
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unlocked]);
 
   const validateMac = (m: string) => /^[a-fA-F0-9]{2}([:\-]?[a-fA-F0-9]{2}){5}$/.test(m.replace(/\s+/g, ""));
   const validatePhone = (p: string) => p.trim().length >= 6 && p.trim().length <= 20;
@@ -192,7 +195,7 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
           </div>
         </div>
         <div className="flex gap-3 mt-4">
-          <button className="btn btn-search" onClick={load} disabled={disabled}>
+          <button className="btn btn-search" onClick={() => load()} disabled={disabled}>
             {loading ? (
               <>
                 <div className="w-4 h-4 bg-white rounded-full animate-pulse mr-2"></div>
@@ -205,8 +208,9 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
           <button
             className="btn btn-reset"
             onClick={() => {
-              setQuery({ name: "", mac: "", phone: "" });
-              load();
+              const cleared = { name: "", mac: "", phone: "" };
+              setQuery(cleared);
+              load(cleared);
             }}
             disabled={disabled}
           >
@@ -226,7 +230,39 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
           <h2 className="text-lg font-semibold text-blue-700">Results</h2>
           <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">{records.length}</span>
         </div>
-        <div className="overflow-auto">
+        {/* Mobile cards */}
+        <div className="sm:hidden">
+          {records.map((r) => (
+            <div key={r._id} className="record-card">
+              <div className="record-row"><span className="record-label">Name</span><span className="record-value">{r.name}</span></div>
+              <div className="record-row"><span className="record-label">MAC</span><span className="record-value font-mono tracking-wider">{fmtMac(r.mac)}</span></div>
+              <div className="record-row"><span className="record-label">Phone</span><span className="record-value">{r.phone}</span></div>
+              <div className="flex gap-2 mt-3">
+                <button className="btn btn-edit-beautiful w-full" onClick={() => beginEdit(r)} disabled={disabled}>Edit</button>
+              </div>
+              {editId === r._id && (
+                <div className="mt-3 space-y-2">
+                  <input className="input" value={editValues.name} onChange={(e) => setEditValues({ ...editValues, name: e.target.value })} placeholder="Name" disabled={disabled} />
+                  {editErrors.name && <div className="text-red-500 text-xs">{editErrors.name}</div>}
+                  <input className="input" value={editValues.mac} onChange={(e) => setEditValues({ ...editValues, mac: e.target.value })} placeholder="MAC" disabled={disabled} />
+                  {editErrors.mac && <div className="text-red-500 text-xs">{editErrors.mac}</div>}
+                  <input className="input" value={editValues.phone} onChange={(e) => setEditValues({ ...editValues, phone: e.target.value })} placeholder="Phone" disabled={disabled} />
+                  {editErrors.phone && <div className="text-red-500 text-xs">{editErrors.phone}</div>}
+                  <div className="flex gap-2">
+                    <button className="btn btn-save w-full" onClick={() => saveEdit(r._id)} disabled={disabled}>Save</button>
+                    <button className="btn btn-cancel w-full" onClick={cancelEdit} disabled={disabled}>Cancel</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+          {records.length === 0 && !loading && (
+            <div className="text-center opacity-70 py-6">No records found</div>
+          )}
+        </div>
+
+        {/* Desktop/tablet table */}
+        <div className="hidden sm:block overflow-auto">
           <table className="min-w-full text-sm table">
             <thead>
               <tr className="text-left border-b border-blue-200">

@@ -165,6 +165,10 @@ html, body {
   display: block;
 }
 
+.hidden {
+  display: none;
+}
+
 .fixed {
   position: fixed;
 }
@@ -437,17 +441,22 @@ html, body {
 
 /* Responsive utilities */
 @media (min-width: 640px) {
-  .sm\\:p-4 {
+  .sm\:p-4 {
     padding: 1.5rem;
   }
   
-  .sm\\:grid-cols-3 {
+  .sm\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   
-  .sm\\:col-span-3 {
+  .sm\:col-span-3 {
     grid-column: span 3 / span 3;
   }
+  
+  .sm\:block { display: block; }
+  .sm\:flex { display: flex; }
+  .sm\:grid { display: grid; }
+  .sm\:hidden { display: none; }
   
   .sidebar {
     width: 280px;
@@ -463,19 +472,101 @@ html, body {
 @media (max-width: 639px) {
   .sidebar {
     position: fixed;
+    top: 0;
+    bottom: 0;
     left: -280px;
     z-index: 50;
-    transition: left 0.3s ease;
+    transition: left 0.3s ease, box-shadow 0.3s ease;
   }
   
   .sidebar.mobile-open {
     left: 0;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  }
+  
+  /* Prevent collapsed width on mobile */
+  .sidebar.sidebar-collapsed {
+    width: 280px;
   }
   
   .main-content {
     margin-left: 0;
   }
 }
+
+/* Top app bar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: hsl(var(--card));
+  border-bottom: 1px solid hsl(var(--border));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+}
+
+.topbar-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.hamburger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+}
+
+/* Sidebar overlay for mobile */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.4);
+  z-index: 45;
+}
+
+/* Bottom tab navigation (mobile) */
+.bottom-nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+  background: hsl(var(--card));
+  border-top: 1px solid hsl(var(--border));
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.bottom-nav button {
+  padding: 0.75rem 0.5rem;
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+}
+
+.bottom-nav button.active {
+  color: hsl(var(--primary));
+  font-weight: 600;
+}
+
+/* Record item card (mobile) */
+.record-card {
+  border-radius: 0.75rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  padding: 1rem;
+}
+
+.record-card + .record-card { margin-top: 0.75rem; }
+
+.record-row { display: flex; justify-content: space-between; gap: 0.75rem; }
+.record-label { font-size: 0.75rem; color: hsl(var(--muted-foreground)); }
+.record-value { font-weight: 500; }
 
 :root {
   --background: #ffffff;
@@ -495,7 +586,7 @@ html, body {
   --border: #e9ecef;
   --input: #ffffff;
   --ring: #000000;
-  --sidebar: #ffffff;
+  --sidebar: #f8fafc; /* subtle light background so it doesn't appear transparent */
   --sidebar-foreground: #1a1a1a;
   --sidebar-accent: #f8f9fa;
   --radius: 0.75rem;
@@ -520,7 +611,7 @@ html, body {
     --border: #2a2a2a;
     --input: #1a1a1a;
     --ring: #ffffff;
-    --sidebar: #0a0a0a;
+    --sidebar: #111827; /* solid dark slate for clear contrast */
     --sidebar-foreground: #ffffff;
     --sidebar-accent: #2a2a2a;
   }

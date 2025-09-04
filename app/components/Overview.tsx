@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 type OverviewProps = {
   unlocked: boolean;
+  onNavigate?: (view: "overview" | "records" | "add") => void;
 };
 
 type Stats = {
@@ -12,7 +13,7 @@ type Stats = {
   unique: number;
 };
 
-export default function Overview({ unlocked }: OverviewProps) {
+export default function Overview({ unlocked, onNavigate }: OverviewProps) {
   const [stats, setStats] = useState<Stats>({ total: 0, recent: 0, unique: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -107,7 +108,19 @@ export default function Overview({ unlocked }: OverviewProps) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="action-card action-card-blue">
+        <div
+          className="action-card action-card-blue"
+          role="button"
+          tabIndex={0}
+          onClick={() => onNavigate && onNavigate("records")}
+          onKeyDown={(e) => {
+            if ((e.key === "Enter" || e.key === " ") && onNavigate) {
+              e.preventDefault();
+              onNavigate("records");
+            }
+          }}
+          aria-label="Go to Records to search and manage entries"
+        >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,7 +134,19 @@ export default function Overview({ unlocked }: OverviewProps) {
           </div>
         </div>
         
-        <div className="action-card action-card-green">
+        <div
+          className="action-card action-card-green"
+          role="button"
+          tabIndex={0}
+          onClick={() => onNavigate && onNavigate("add")}
+          onKeyDown={(e) => {
+            if ((e.key === "Enter" || e.key === " ") && onNavigate) {
+              e.preventDefault();
+              onNavigate("add");
+            }
+          }}
+          aria-label="Go to Add Record to create a new entry"
+        >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

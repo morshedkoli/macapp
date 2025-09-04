@@ -13,6 +13,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [currentView, setCurrentView] = useState("overview");
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Toasts
   type Toast = { id: number; kind: "success" | "error" | "info"; message: string };
@@ -77,13 +78,13 @@ export default function Home() {
   const renderCurrentView = () => {
     switch (currentView) {
       case "overview":
-        return <Overview unlocked={unlocked} />;
+        return <Overview unlocked={unlocked} onNavigate={(v) => setCurrentView(v)} />;
       case "records":
         return <Records unlocked={unlocked} onToast={addToast} />;
       case "add":
         return <AddRecord unlocked={unlocked} onToast={addToast} />;
       default:
-        return <Overview unlocked={unlocked} />;
+        return <Overview unlocked={unlocked} onNavigate={(v) => setCurrentView(v)} />;
     }
   };
 
@@ -194,16 +195,68 @@ export default function Home() {
 
   return (
     <div className="main-layout">
+      {/* Mobile overlay */}
+      {mobileSidebarOpen && (
+        <div className="sidebar-overlay sm:hidden" onClick={() => setMobileSidebarOpen(false)}></div>
+      )}
+
       <Sidebar
         currentView={currentView}
-        onViewChange={setCurrentView}
+        onViewChange={(v) => {
+          setCurrentView(v);
+          setMobileSidebarOpen(false);
+        }}
         onLock={onLock}
         disabled={busy}
+        mobileOpen={mobileSidebarOpen}
+        onToggleMobile={setMobileSidebarOpen}
       />
+
       <main className="main-content">
-        {renderCurrentView()}
+        {/* Top bar (mobile only) */}
+        <div className="topbar sm:hidden">
+          <button
+            aria-label="Open menu"
+            className="hamburger-btn"
+            onClick={() => setMobileSidebarOpen(true)}
+          >
+            ☰
+          </button>
+          <div className="topbar-title">MAC Dashboard</div>
+          <div style={{ width: 40 }} />
+        </div>
+
+        {/* Content */}
+        <div className="p-4 sm:p-4 md:p-6">
+          {renderCurrentView()}
+        </div>
+
+        {/* Spacer to avoid bottom-nav overlap on mobile */}
+        <div className="sm:hidden" style={{ height: 56 }}></div>
+
+        {/* Bottom tab navigation (mobile only) */}
+        <div className="bottom-nav sm:hidden">
+          <button
+            className={currentView === "overview" ? "active" : ""}
+            onClick={() => setCurrentView("overview")}
+          >
+            🏠 Overview
+          </button>
+          <button
+            className={currentView === "records" ? "active" : ""}
+            onClick={() => setCurrentView("records")}
+          >
+            📋 Records
+          </button>
+          <button
+            className={currentView === "add" ? "active" : ""}
+            onClick={() => setCurrentView("add")}
+          >
+            ➕ Add
+          </button>
+        </div>
       </main>
-      
+
       {/* Toasts */}
       <div className="fixed top-4 right-4 space-y-2 z-50">
         {toasts.map((t) => (
