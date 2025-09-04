@@ -25,16 +25,7 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
   const [editValues, setEditValues] = useState({ name: "", mac: "", phone: "" });
   const [editErrors, setEditErrors] = useState<{ name?: string; mac?: string; phone?: string }>({});
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  const [confirmDeleteLabel, setConfirmDeleteLabel] = useState<string>("");
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    if (unlocked) {
-      load();
-    } else {
-      setRecords([]);
-    }
-  }, [unlocked]);
 
   const load = async () => {
     setLoading(true);
@@ -50,13 +41,23 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
         throw new Error(j.error || "Failed to load records");
       }
       const j = await res.json();
-      setRecords(j.records as RecordItem[]);
-    } catch (e: any) {
-      setError(e.message || "Failed to load records");
+      setRecords(j.records || []);
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Failed to load records";
+      setError(errorMessage);
+      onToast("error", errorMessage);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (unlocked) {
+      load();
+    } else {
+      setRecords([]);
+    }
+  }, [unlocked, load]);
 
   const validateMac = (m: string) => /^[a-fA-F0-9]{2}([:\-]?[a-fA-F0-9]{2}){5}$/.test(m.replace(/\s+/g, ""));
   const validatePhone = (p: string) => p.trim().length >= 6 && p.trim().length <= 20;
@@ -99,9 +100,10 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
       setEditErrors({});
       await load();
       onToast("success", "Record updated");
-    } catch (e: any) {
-      setError(e.message || "Update failed");
-      onToast("error", e.message || "Update failed");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Update failed";
+      setError(errorMessage);
+      onToast("error", errorMessage);
     } finally {
       setBusy(false);
     }
@@ -118,9 +120,10 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
       }
       await load();
       onToast("success", "Record deleted");
-    } catch (e: any) {
-      setError(e.message || "Delete failed");
-      onToast("error", e.message || "Delete failed");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Delete failed";
+      setError(errorMessage);
+      onToast("error", errorMessage);
     } finally {
       setBusy(false);
     }
@@ -327,7 +330,7 @@ export default function Records({ unlocked, onToast }: RecordsProps) {
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
           <div className="card w-full max-w-sm">
             <h3 className="text-lg font-medium">Delete record?</h3>
-            <p className="text-sm opacity-80 mt-1">{confirmDeleteLabel}</p>
+            <p className="text-sm opacity-80 mt-1">This action cannot be undone.</p>
             <div className="mt-4 flex gap-2 justify-end">
               <button className="btn btn-outline" onClick={() => setConfirmDeleteId(null)} disabled={busy}>
                 Cancel

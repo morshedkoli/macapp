@@ -3,8 +3,11 @@ import mongoose from 'mongoose';
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+  throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
 }
+
+// Type assertion since we've already checked it exists
+const mongoUri: string = MONGODB_URI;
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
@@ -34,16 +37,16 @@ async function connectDB() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(mongoUri, opts).catch((error: unknown) => {
       return mongoose;
     });
   }
 
   try {
     cached.conn = await cached.promise;
-  } catch (e) {
+  } catch (error: unknown) {
     cached.promise = null;
-    throw e;
+    throw error;
   }
 
   return cached.conn;

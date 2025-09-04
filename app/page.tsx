@@ -53,9 +53,10 @@ export default function Home() {
       setUnlocked(true);
       setPin("");
       addToast("success", "Unlocked");
-    } catch (e: any) {
-      setError(e.message || "Unlock failed");
-      addToast("error", e.message || "Unlock failed");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Unlock failed";
+      setError(errorMessage);
+      addToast("error", errorMessage);
     } finally {
       setBusy(false);
     }

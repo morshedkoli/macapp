@@ -69,7 +69,7 @@ export async function PATCH(
     const mac = body?.mac !== undefined ? String(body.mac).trim() : undefined;
     const phone = body?.phone !== undefined ? String(body.phone).trim() : undefined;
 
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (name !== undefined) {
       if (!name) return Response.json({ error: "Name is required" }, { status: 400 });
       updateData.name = name;
@@ -96,10 +96,10 @@ export async function PATCH(
     }
 
     return Response.json({ record: updated });
-  } catch (error: any) {
-    console.error("Database error:", error);
-    if (error.code === 11000) {
-      return Response.json({ error: "MAC address already exists" }, { status: 400 });
+  } catch (e: unknown) {
+    console.error("Database error:", e);
+    if (e instanceof mongoose.Error.ValidationError) {
+      return Response.json({ error: "Validation failed" }, { status: 400 });
     }
     return Response.json({ error: "Update failed" }, { status: 500 });
   }

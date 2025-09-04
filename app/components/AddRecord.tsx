@@ -57,9 +57,10 @@ export default function AddRecord({ unlocked, onToast }: AddRecordProps) {
       setCreating({ name: "", mac: "", phone: "" });
       setCreatingErrors({});
       onToast("success", "Record created successfully");
-    } catch (e: any) {
-      setError(e.message || "Create failed");
-      onToast("error", e.message || "Create failed");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Create failed";
+      setError(errorMessage);
+      onToast("error", errorMessage);
     } finally {
       setBusy(false);
     }

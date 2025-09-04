@@ -34,11 +34,11 @@ export default function Overview({ unlocked }: OverviewProps) {
         
         setStats({
           total: records.length,
-          recent: records.filter((r: any) => new Date(r.createdAt) > oneDayAgo).length,
-          unique: new Set(records.map((r: any) => r.mac)).size,
+          recent: records.filter((r: { createdAt: string }) => new Date(r.createdAt) > oneDayAgo).length,
+          unique: new Set(records.map((r: { mac: string }) => r.mac)).size,
         });
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error("Failed to load stats:", e);
     } finally {
       setLoading(false);

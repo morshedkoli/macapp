@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     const mac = searchParams.get("mac")?.trim();
     const phone = searchParams.get("phone")?.trim();
 
-    const query: any = {};
+    const query: Record<string, unknown> = {};
     if (name) query.name = { $regex: name, $options: "i" };
     if (phone) query.phone = { $regex: phone, $options: "i" };
     if (mac) {
@@ -84,9 +84,9 @@ export async function POST(req: NextRequest) {
 
     const created = await record.save();
     return Response.json({ record: created });
-  } catch (error: any) {
-    console.error("Database error:", error);
-    if (error.code === 11000) {
+  } catch (e: unknown) {
+    console.error("Database error:", e);
+    if (e instanceof Error && e.message.includes("E11000")) {
       return Response.json({ error: "MAC address already exists" }, { status: 400 });
     }
     return Response.json({ error: "Database error" }, { status: 500 });
